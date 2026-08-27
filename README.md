@@ -16,13 +16,17 @@ Benchmarking edge AI inference performance on the ODROID-HC1 (Samsung Exynos 542
 
 ## Benchmark Results 📊
 
-Performance comparison showing why thread pinning to high-performance cores outperforms multi-cluster CPU threading on big.LITTLE architectures (`llama.cpp` / Qwen 0.5B Q4_K_M):
+Empirical performance benchmark on the ODROID-HC1 running **Qwen2 1B (Q4_K_Medium)** via `llama.cpp` (build `925e11799`):
 
 | Execution Mode | Target Cores | Thread Count | Prompt Processing (pp512) | Text Generation (tg128) |
 | :--- | :--- | :--- | :--- | :--- |
 | **All Cores (Unbound)** | Cores 0–7 | `-t 4` | 4.48 t/s | 2.42 t/s |
-| **Cortex-A15 (Fast)** | **Cores 4–7** | **`-t 4`** | **4.49 t/s** | **2.55 t/s** *(Optimal)* |
-| **Cortex-A7 (Slow)** | Cores 0–3 | `-t 4` | ~1.35 t/s | ~0.85 t/s |
+| **Cortex-A15 (Fast)** | **Cores 4–7** | **`-t 4`** | **4.48 ± 0.04 t/s** | **2.49 ± 0.00 t/s** *(Optimal)* |
+| **Cortex-A7 (Slow)** | Cores 0–3 | `-t 4` | 1.80 ± 0.00 t/s | 0.88 ± 0.00 t/s |
+
+
+> **Key Takeaway:** Pinning execution strictly to the Cortex-A15 fast core cluster yields a **~2.49× speedup** in prompt processing and a **~2.83× speedup** in text generation over the Cortex-A7 cores.
+
 
 > **Key takeaway:** Pinning matrix multiplication strictly to the Cortex-A15 cluster (`taskset -c 4-7`) prevents layer synchronization delays caused by the slower Cortex-A7 cores, unlocking maximum tokens-per-second.
 
