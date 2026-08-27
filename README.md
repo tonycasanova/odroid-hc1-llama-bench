@@ -34,6 +34,10 @@ odroid@odroid:~/llama.cpp$ taskset -c 4-7 ./build/bin/llama-bench -m qwen0.5b.gg
 
 build: 925e11799 (10642)
 
+| test  | baseline      | tuned (LTO + ffast-math) |
+| ----- | ------------- | ------------------------ |
+| pp512 | 15.72 ± 0.04  | 15.75 ± 0.09 t/s        |
+| tg128 |  5.67 ± 0.03  |  5.73 ± 0.10 t/s        |
 
 The tiny +1% bump in tg128 (from 5.67 to 5.73 t/s) indicates that compilation flags and static optimization are no longer your bottleneck. Your CPU is actively waiting on the hardware memory bus.
 Why the Wall Was Hit
