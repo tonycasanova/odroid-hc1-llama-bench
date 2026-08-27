@@ -1,4 +1,17 @@
-## 🛑 Why the Wall Was Hit
+## 📊 ODROID-HC1 Baseline Performance
+
+**Hardware:** Samsung Exynos 5422 (4x Cortex-A15 @ 2.0GHz pinned via `taskset -c 4-7`)  
+**Model:** `Qwen2-0.5B-Instruct` (Q4_K_M — 462.96 MiB)  
+**Flags:** `-O3 -ffast-math -fno-finite-math-only -ftree-vectorize -DGGML_LTO=ON`
+
+| Model | Size | Params | Backend | Threads | Test | Speed (t/s) |
+| :--- | ---: | ---: | :--- | ---: | :--- | ---: |
+| Qwen2 0.5B (Q4_K_M) | 462.96 MiB | 630.17 M | CPU | 4 | pp512 | 15.75 ± 0.09 |
+| Qwen2 0.5B (Q4_K_M) | 462.96 MiB | 630.17 M | CPU | 4 | tg128 | 5.73 ± 0.10 |
+
+---
+
+## 🛑 Hardware Bottleneck Analysis
 
 ### 1. Calculated Memory Bandwidth Limit
 
@@ -8,20 +21,5 @@ During token generation (`tg128`), every output token requires loading the entir
 * **Token Rate:** `~5.73 tokens/sec`
 * **Actual Memory Throughput:**
 
-$$462.96\text{ MiB} \times 5.73\text{ t/s} \approx 2.65\text{ GB/s}$$
-
-> [!NOTE]
-> The **ODROID-HC1** (Samsung Exynos 5422) features dual-channel 32-bit LPDDR3 @ 933 MHz, which caps out near **2.8 to 3.0 GB/s** of real-world effective memory bandwidth under multi-core loads. 
-> 
-> **Current Utilization:** Running at **~90–95%** of the absolute hardware bandwidth ceiling.
-
----
-
-### 2. 32-bit ARM Architecture Limitations
-
-Modern ARM architectures leverage hardware matrix-multiplication extensions to drastically reduce CPU cycle overhead:
-
-* **ARMv8.2+ (64-bit):** Uses specialized vector instructions such as `DOTPROD` (Dot Product) and `I8MM` (Int8 Matrix Multiply) to accelerate quantized tensor math.
-* **Cortex-A15 (ARMv7-A / 32-bit):** Lacks these specialized matrix instructions, relying entirely on standard **128-bit NEON SIMD** routines. 
-
-Execution is already running as fast as the physical hardware and instruction set allow.
+```math
+462.96\text{ MiB} \times 5.73\text{ t/s} \approx 2.65\text{ GB/s}
