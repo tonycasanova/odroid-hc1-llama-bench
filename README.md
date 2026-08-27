@@ -18,7 +18,7 @@ Benchmarking edge AI inference performance on the ODROID-HC1 (Samsung Exynos 542
 
 Empirical performance benchmark on the ODROID-HC1 running **Qwen2 1B (Q4_K_Medium)** via `llama.cpp` (build `925e11799`):
 
-| Execution Mode | Target Cores | Thread Count | Prompt Processing (pp512) | Text Generation (tg128) |
+| Execution Mode | Target Cores | Thread Count | Prompt Processing (pp512) | Token Generation (tg128) |
 | :--- | :--- | :--- | :--- | :--- |
 | **All Cores (Unbound)** | Cores 0–7 | `-t 4` | 4.48 t/s | 2.42 t/s |
 | **Cortex-A15 (Fast)** | **Cores 4–7** | **`-t 4`** | **4.48 ± 0.04 t/s** | **2.49 ± 0.00 t/s** *(Optimal)* |
@@ -53,7 +53,7 @@ Because the Cortex-A15 is an ARMv7-A chip, it relies purely on standard 128-bit 
 
 
 
-> **Key Takeaway:** Pinning execution strictly to the Cortex-A15 fast core cluster yields a **~2.49× speedup** in prompt processing and a **~2.83× speedup** in text generation over the Cortex-A7 cores.
+> **Key Takeaway:** Pinning execution strictly to the Cortex-A15 fast core cluster yields a **~2.49× speedup** in prompt processing and a **~2.83× speedup** in token generation over the Cortex-A7 cores.
 
 
 > **Key takeaway:** Pinning matrix multiplication strictly to the Cortex-A15 cluster (`taskset -c 4-7`) prevents layer synchronization delays caused by the slower Cortex-A7 cores, unlocking maximum tokens-per-second.
@@ -62,7 +62,7 @@ Because the Cortex-A15 is an ARMv7-A chip, it relies purely on standard 128-bit 
 
 ## Production Execution Commands 💻
 
-### 1. Optimal Text Completion
+### 1. Optimal Token Completion
 Runs inference using strictly the 4 Cortex-A15 cores:
 ```bash
 taskset -c 4-7 ./build/bin/llama-completion \
